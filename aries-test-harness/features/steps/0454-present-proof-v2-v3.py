@@ -7,7 +7,15 @@ from agent_test_utils import (
     get_relative_timestamp_to_epoch,
     amend_presentation_definition_with_runtime_data,
 )
-from distutils.util import strtobool
+
+
+def strtobool(value: str) -> bool:
+    value = value.lower()
+    if value in ("y", "yes", "t", "true", "on", "1"):
+        return True
+    if value in ("n", "no", "f", "false", "off", "0"):
+        return False
+    raise ValueError(f"invalid truth value {value!r}")
 
 
 def prepare_proof_request(context: Any, request_for_proof: str) -> Dict[str, Any]:

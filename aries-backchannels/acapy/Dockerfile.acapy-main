@@ -1,9 +1,14 @@
-FROM python:3.13-slim-bullseye
+FROM python:3.13-slim-bookworm
 
+# libindy is only published for Ubuntu bionic/Debian bullseye-era OpenSSL 1.1, which
+# bookworm dropped, so libssl1.1 is staged manually from the Debian snapshot archive.
 RUN apt-get update \
-   && apt-get install -y git gnupg2 software-properties-common curl \
-   && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9692C00E657DDE61  \
-   && add-apt-repository 'deb https://hyperledger.jfrog.io/artifactory/indy bionic stable' \
+   && apt-get install -y git gnupg2 curl \
+   && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9692C00E657DDE61 \
+   && curl -sfL -o /tmp/libssl1.1.deb 'http://snapshot.debian.org/archive/debian/20220801T000000Z/pool/main/o/openssl/libssl1.1_1.1.1n-0%2bdeb11u3_amd64.deb' \
+   && dpkg -i /tmp/libssl1.1.deb \
+   && rm /tmp/libssl1.1.deb \
+   && echo 'deb https://hyperledger.jfrog.io/artifactory/indy bionic stable' > /etc/apt/sources.list.d/indy.list \
    && apt-get update \
    && apt-get install -y libindy libnullpay
 
